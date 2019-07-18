@@ -1,0 +1,319 @@
+---
+title: "BIMS 6000 R Tutorial 2018"
+author: "Aakrosh Ratan"
+output: html_notebook
+---
+
+# Exploring Genome Variation using R
+
+### Input Data
+
+Input data files are here: https://www.dropbox.com/sh/h1545vpvgfk0ad2/AACNeyabqXUzYa2IKgEMDenqa?dl=0 . 
+
+There are two files available on the url:
+
+1. Genomes.annotated.txt.gz: A zipped file with the genotypes of 30 modern humans, a Neanderthal individual, a Denisovan individual and the human-chimp ancestor at variant locations on chr20. The reported genotype is an integer that specifies the number of alternate alleles in the individual. For example if the reference allele is 'A' and the alternate allele is 'C', then an individual with a genotype 'A/A' is tagged as 0, 'A/C' is 1, 'C/C' is 2. Please note that all modern humans, the neanderthal individual and the denisovan individual have genotypes 0,1 or 2. The human-chimp ancestor is haploid (similar to the reference genome), so the reported genotypes are 0 or 1.
+
+2. metadata.txt : Some metadata associated with the samples. 
+
+Once you have downloaded the input files to a folder of your choice, you should set your working directory to it. You can use the 'setwd' command to do so, or use the 'Files' -> 'More' -> 'Set as working directory' on the section of Rstudio at the bottom right. Then follow along this tutorial.
+
+
+Load the libraries that we will use throughout this tutorial
+
+```{r}
+library(tidyverse)
+library(magrittr)
+library(broom)
+```
+
+
+Read in the data file with the genotypes. Remember, we have the column names in the input data file. Also note that the command used below is capable of reading zipped files.
+
+```{r}
+data = read_tsv('Genomes.annotated.txt.gz')
+```
+
+Let us look at the first few lines of the dataframe. You can use 'head' to look at the beginning, and 'tail' to look at the end of the dataframe. Look at the help section for 'head' to see how you would control the number of rows you can see using the command.
+
+```{r}
+head(data)
+```
+
+
+Let us read the metadata information from the file. Remember in this case, the file does not have the names of the columns. So we will use set_colnames to set those. Note that we have to specify 'col_names = F' with 'read_tsv' . What would happen if we do not specify 'col_names = F'?
+
+```{r}
+# get the population information
+pop = read_tsv('metadata.txt', col_names = F) %>%
+  set_colnames(c('sample','population','human'))
+```
+
+Again, lets look at the dataframe. This time we will peek at the first 10 rows.
+
+```{r}
+head(pop, n = 10)
+```
+
+We have two dataframes; one specifying the raw data, and the other one specifying the associated metadata. Storing files this way makes sense, but when exploring and manipulating it is easier to work with a single dataframe that encapsulates all the data we are interested in. 
+
+But before we attempt to combine the two dataframes, we should convert these dataframes to conform to the tenets of 'tidy data'. Please read the article https://www.jstatsoft.org/article/view/v059i10 to understand the basic idea and philosophy behind tidy data. 
+
+In brief, the basic principles of tidy data are:
+
+1. Each variable forms a column.
+2. Each observation forms a row.
+3. Each type of observational unit forms a table.
+
+Data in this format will make it easier to manipulate, model and visualize using libraries that are included as part of tidyverse. 
+
+### Tidy'ing the genotype dataset
+
+The command to tidy the data is 'gather'. Look at the help section for 'gather' and try to see if you can understand the following command. 
+
+```{r}
+clean_data = gather(data, sample, genotype, 4:36)
+```
+
+Here we are saying that we want columns 4-36 to be made into rows, and put under a column named 'sample'. The values that correspond to the genotypes should then be put under a column called 'genotype'. 
+
+Lets look at the first few lines of this clean dataset
+```{r}
+head(clean_data)
+```
+
+Now look at the 'pop' dataframe. Do we need to do anything to it to 'clean' it?
+
+### Creating a single dataframe
+
+We will use an inner join to combine the 'clean_data' dataframe with the 'pop' dataframe
+
+```{r}
+df = clean_data %>%
+  inner_join(pop, by = 'sample')
+```
+
+Let us look at the first few lines of the resulting dataframe. 
+```{r}
+head(df)
+```
+
+
+### SNPs per genome
+
+In the morning lecture on Genome Variation, we talked about how founder-effect can lead to lower diversity in the migrant populations. Modern humans originated in Africa and migrated to inhabit the other parts of the world. Based on that information, it is reasonable to assume that African individuals should have more SNVs compared to Europeans and Asians. How can you use the above data to plot the number of SNVs per modern human individual grouped by population.
+
+```{r}
+df %>%
+  filter(human == "modern") %>%
+  group_by(sample,genotype,population) %>%
+  count() %>%
+  filter(genotype != 0) %>%
+  group_by(sample,population) %>%
+  summarise(numsnps = sum(n)) %>%
+  ggplot(aes(sample,numsnps,group = population, color = population)) + geom_boxplot() + 
+    geom_jitter() + 
+    theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+```
+
+Can you change the Y-axis to start from 0 instead of 65,000?
+What happens when you include the ancient DNA samples?
+
+### Allele frequencies
+
+Modern humans have only been around for 100,000 - 150,000 years, but our census size has increased significantly. As we talked about in the lecture, this is true even though our effective population size remains low. Does this mean that most of the variation that we will find is rare variation? Lets us use this dataset to take a look at the alternate allele frequency of the variants.
+
+```{r}
+df %>%
+  filter(human == "modern") %>%
+  filter(genotype != 0) %>%
+  group_by(POS) %>%
+  summarise(num_alt_alleles = sum(genotype)) %>%
+  ggplot(aes(num_alt_alleles)) + geom_histogram(binwidth = 1)
+  
+```
+
+### Principal Component Analysis
+* What is PCA?
+Principal component analysis (PCA) is a technique used to emphasize variation and bring out strong patterns in a dataset. It's often used to make data easy to explore and visualize. Remember this does not replace statistical tests, but this is often helpful in giving a feel for the data. 
+
+* Why is it important to emphasize variation and why do we want to use PCA ? 
+PCA is useful for dimension reduction. Let us say I have a 2-D dataset, and I want to view it in a single dimension. It makes most sense to see it on the dimension where we see the most variation, so the samples that are the most different stand out. 
+
+* An excellent visual explanation of PCA is shown here: http://setosa.io/ev/principal-component-analysis/
+
+In this case, we will use a command that is not part of tidyverse (prcomp), but it is used very frequently. Therefore a verb 'tidy' has been introduced as part of the 'broom' package to clean up such analyses. You will find similar functions to clean up data structures from gene-expression analyses for example.
+
+```{r}
+# we only want to look at modern humans
+modern = data[,c(7:ncol(data))]
+
+pca = prcomp(t(modern))
+
+# lets tidy and plot it
+pca %>%
+  tidy(matrix = "samples") %>%
+  filter(PC == 1 | PC == 2)  %>%
+  spread(PC,value) %>%
+  set_colnames(c('sample','PC1','PC2')) %>%
+  inner_join(pop) %>%
+  ggplot(aes(PC1, PC2,color = population)) + geom_point()
+```
+
+Here we plot the 1st and the 2nd principal component. Can you plot the 2nd and the 3rd instead?
+
+### f2 variants
+
+f2 variants are defined as SNVs that are only observed in two of the sequenced samples. These variants are typically the most recent of informative mutations and based on that alone, one would hypothesize that they would be shared between individuals of the same population more so than between individuals from different populations. Is that true for the above dataset?
+
+First let us find (and count) the number of SNVs that are only observed in two samples.
+
+```{r}
+# how many such variants exist?
+num_f2_sites = df %>%
+  filter(human == "modern") %>%
+  filter(genotype != 0) %>% 
+  group_by(POS) %>%
+  summarise(num_samples = n()) %>%
+  filter(num_samples == 2)
+
+num_f2_sites
+```
+
+Now let us find the samples and populations that share these F2 variants
+
+```{r}
+num_f2_sites %>%
+  inner_join(df) %>%
+  filter(human == "modern") %>%
+  filter(genotype != 0) %>%
+  group_by(POS) %>%
+  summarise(pop_string = paste(population, collapse = "_")) %>%
+  group_by(pop_string) %>%
+  summarise(numf2 = n())
+```
+
+In this dataset ~89% of the F2 variants are shared within the same population. Remember, we have only considered 30 individuals and we are only looking at SNVs on chr20, both of which lead to an over-estimate of this fraction. The 1000 genomes project found that these F2 variants were shared by members of the same population ~53% of the time.
+
+
+### Neanderthal Introgression
+
+Neanderthals have contributed approximately 1-4% of the genomes of non-African modern humans, although a modern human who lived about 40,000 years ago has been found to have between 6-9% Neanderthal DNA (Fu et al 2015). How did we arrive at those numbers? Can one use a dataset like the one we have to answer such questions? 
+
+
+Lets see if we can use some plots to see if the above statements appear to be true. We will use PCA and first create a 'view' using just the archaic humans, and the human-chimp ancestor. The command below is the same as that used for PCA above, but notice 'retx = T;. Use help to find out what that does.
+
+```{r}
+pca = prcomp(t(data[,c(4,5,6)]), retx = TRUE, center = T)
+pca %>%
+  tidy(matrix = "samples") %>%
+  filter(PC == 1 | PC == 2)  %>%
+  spread(PC,value) %>%
+  set_colnames(c('sample','PC1','PC2')) %>%
+  inner_join(pop) %>%
+  ggplot(aes(PC1, PC2,color = sample)) + geom_point()
+
+```
+
+Now if we project the modern samples on to this 'view'. 'predict' is used for this.
+
+```{r}
+predictions = predict(pca, t(data[,c(4:ncol(data))]))
+
+as.data.frame(predictions) %>%
+  rownames_to_column() %>%
+  set_colnames(c('sample', 'PC1', 'PC2', 'PC3')) %>%
+  inner_join(pop) %>%
+  ggplot(aes(PC1, PC2,color = population)) + geom_point() 
+```
+
+As you can see, human samples clump together. But what if we get really close. Axes can be controlled using 'xlim' and 'ylim' commands.
+
+```{r}
+as.data.frame(predictions) %>%
+  rownames_to_column() %>%
+  set_colnames(c('sample', 'PC1', 'PC2', 'PC3')) %>%
+  inner_join(pop) %>%
+  ggplot(aes(PC1, PC2,color = population)) + geom_point() + xlim(-150,-75) + ylim(-20,0)
+```
+
+All right. So it does seem that Africans are moving away from the Neanderthals.
+
+Now lets see if we can use some numbers to convince us of the above. This section follows the analysis that has been detailed in the wonderful blog post here: http://johnhawks.net/weblog/reviews/neandertals/pigmentation/neandertal-introgression-1000-genomes-style-2011.html. 
+
+The basic idea is as follows: Let us find the derived SNP alleles that are present in Neanderthals and not present in the human-chimp ancestor. We can then count the number of them that are in each of the modern  human sequences. If one sequence has significantly more Neandertal derived alleles than another, then it got it somehow...
+
+First let us find out the number of sites where 
+1. the Neanderthal individual has an allele that is not seen in the human-chimp ancestor
+2. Both alleles are seen in modern humans
+
+
+```{r}
+sites1 = df %>%
+  filter(human == "archaic") %>%
+  select(-population,-human) %>%
+  group_by(POS,sample) %>%
+  spread(sample,genotype) %>%
+  filter(ancestor == 0 & neanderthal == 2)
+
+sites2 = df %>%
+  filter(human == "archaic") %>%
+  select(-population,-human) %>%
+  group_by(POS,sample) %>%
+  spread(sample,genotype) %>%
+  filter(ancestor == 1 & neanderthal == 0)
+
+dim(sites1)
+dim(sites2)
+```
+
+
+
+```{r}
+
+x = sites1 %>%
+  inner_join(df) %>%
+  filter(human == "modern") %>%
+  group_by(sample,population) %>%
+  summarise(num_alleles = sum(genotype))
+
+y = sites2 %>%
+  inner_join(df) %>%
+  filter(human == "modern") %>%
+  group_by(sample,population) %>%
+  summarise(num_alleles = sum(2-genotype))
+
+bind_rows(x,y) %>%
+  group_by(sample, population) %>%
+  summarise_all(sum) %>%
+  ggplot(aes(population,num_alleles, color = population)) + geom_boxplot() + geom_jitter()
+```
+
+So the neanderthal component in GBR population is clearly visible. But JPT and YRI seem like they are not that different. Why do you think that could be? Hint: We are only looking at chr20.
+
+### More resources
+
+#### STATLAB and BIOCONNECTOR COURSES
+http://data.library.virginia.edu/training/
+  Intro to R is Thursday, 9/6 (10:00 - 11:30)
+  Data Wrangling with R, Part I 
+  Unix: Introduction to the Command Line
+  Data Wrangling with R, Part II
+  Data Wrangling with R, Part III 
+  Introduction to Git/GitHub
+  Data Visualization in R 
+  Qualitative Data Analysis
+  and many more!!! (http://cal.hsl.virginia.edu)
+  
+#### ONLINE RESOURCES
+
+http://r4ds.had.co.nz R for Data Science 
+https://www.rstudio.com/online-learning
+
+https://github.com/fivethirtyeight/data Fun datasets to analyze and improve your skills
+http://www.pewresearch.org/download-datasets More data from the Pew Research Center
+
+### CONTACT INFO
+Dr. Aakrosh Ratan ar7jq at virginia dot edu
+
+Olivia Sabik ols5fg at virginia dot edu
