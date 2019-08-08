@@ -74,6 +74,7 @@ So let's rename our data df.
 
 ```{r}
 df = mtcars
+#Aakrosh: Perhaps this is nitpicking, but maybe change "df" to somethinf like "cars_df", to emphasize the importance of clear variable/object names. 
 ```
 
 When we run this line of code, we see a new object appear in our enivornment, called df. What does df look like? Click on it in your environment box. A command should be run in the console that says View(df), and you should see something that looks similar to an excel spreadsheet. Now we can just type in df and R will know we are talking about the mtcars data. When we read in mtcars, it reads in as data.frame, but we're going to convert it to a tibble, which is very similar to a dataframe, but is the format required for the packages we're going to use later. Tibbles also don't have rownames, so we're going to make a new column called rownames, so that information comes along. 
@@ -82,6 +83,7 @@ When we run this line of code, we see a new object appear in our enivornment, ca
 df
 df = as.tibble(mtcars %>% rownames_to_column())
 df
+#Aakrosh: I think if we're going to focus on Tidyverse, this would be a good place to explain %>%, as it might not be completely intuitive.
 ```
 
 Typically, our data is so large that looking at it as a spreadsheet isn't very useful. So how can we look at and manipulate our data? By using functions.
