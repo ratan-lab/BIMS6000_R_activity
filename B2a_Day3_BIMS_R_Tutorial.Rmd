@@ -23,16 +23,18 @@ RStudio has four distinct windows:
 ## 1. Dependencies, aka the administative stuff
 In order for your script to run, you need to tell RStudio where to look for your files, and that place is called your working directory. You can change the working directory like so:
 
+(Note: Here, (username) is a placeholder. Change it to the appropriate username on your device!)
+
 ```{r}
 setwd("/Users/(username)/Desktop/")
 ```
 
 if you are using a PC, the path will look something like this:
 ```{r}
-setwd("c:\Users\(username)\Desktop")
+setwd("C:\Users\(username)\Desktop")
 ```
 
-Of course this path doesn't exist on your computer, so try changing that path to your own desktop. To do so, just start with setwd("/") and with your cursor after the backslash, hit the tab button. This will let you see all the directories available to you. You can also go to the files tab and set your working directory there.
+Of course this path doesn't exist on your computer, so try changing that path to your own desktop. To do so, just start with setwd("/") and with your cursor after the backslash, hit the TAB button. This will let you see all the directories available to you. You can also go to the files tab and set your working directory there.
 
 We'll also need to install whatever packages we want to use. R comes with some built in features, but the beauty of R is that there are tons of researchers who are actively developing software that you can use to do your work in R. installing packages is super easy. Here is an example:
 
@@ -43,8 +45,8 @@ install.packages('tidyverse')
 After installing these packages, we need to load them up into R, so we can use them right now. You only ever need to install a package once in R, but you need to load it each time. Here's an example of how to load up your packages:
 
 ```{r}
-library(datasets)
 library(tidyverse)
+library(datasets)
 sessionInfo()
 ```
 
