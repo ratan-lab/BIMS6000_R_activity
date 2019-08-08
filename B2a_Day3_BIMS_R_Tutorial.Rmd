@@ -57,6 +57,7 @@ In order to analyze you data in R, you need to be able to load your data into R,
 
 ```{r}
 read_csv("my_data.csv")
+#Aakrosh: should we provide a small csv for this example? A stumbling point for new users could be reading in files, especially with and without headers.
 ```
 
 Of course no such file currently exists, so after the class, save an excel file with some data in it as a .csv file, put it in your working directory, and use this code to read it in. 
