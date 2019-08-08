@@ -100,6 +100,7 @@ dim(df)
 ### (2) What does our data frame look like?
 ```{r}
 head(df)
+#Aakrosh: quickly introduce "tail"?
 ```
 
 ### (3) How are the columns named? 
@@ -139,7 +140,7 @@ colnames(df)
 Say we are specifically interested in the miles per gallon (mpg) compared to the weight (wt) of the car, we can simply use select to choose only those two columns of our data. The select function only needs to know the name of the data frame, in this case it's df, and the names of the columns that we want in our output, rownames, mpg, and wt. 
 
 ```{r}
-select(df, rowname, mpg, wt)
+select(.data = df, rowname, mpg, wt)
 ```
 
 Say we just want to remove one column as opposed to selecting all of the other columns. We can use select, but use the negative sign in front of one column name to remove it. 
