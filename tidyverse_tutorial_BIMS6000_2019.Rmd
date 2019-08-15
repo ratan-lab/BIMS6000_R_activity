@@ -1,6 +1,6 @@
 ---
-title: "BIMS 6000 R Tutorial 2018"
-author: Olivia Sabik
+title: "BIMS 6000 R Tutorial 2019"
+author: Basel Al-Barghouthi - Adapted from Olivia Sabik (2018)
 output: html_notebook
 ---
 
