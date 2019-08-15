@@ -1,6 +1,6 @@
 ---
-title: "BIMS 6000 R Tutorial 2018"
-author: Olivia Sabik
+title: "BIMS 6000 R Tutorial 2019"
+author: Basel Al-Barghouthi
 output: html_notebook
 ---
 
@@ -36,7 +36,7 @@ setwd("C:\Users\(username)\Desktop")
 
 Of course this path doesn't exist on your computer, so try changing that path to your own desktop. To do so, just start with setwd("/") and with your cursor after the backslash, hit the TAB button. This will let you see all the directories available to you. You can also go to the files tab and set your working directory there.
 
-We'll also need to install whatever packages we want to use. R comes with some built in features, but the beauty of R is that there are tons of researchers who are actively developing software that you can use to do your work in R. installing packages is super easy. Here is an example:
+We'll also need to install whatever packages we want to use. R comes with some built in features, but the beauty of R is that there are tons of researchers who are actively developing software that you can use to do your work in R. Installing packages is super easy. Here is an example:
 
 ```{r}
 install.packages('tidyverse')
@@ -46,80 +46,69 @@ After installing these packages, we need to load them up into R, so we can use t
 
 ```{r}
 library(tidyverse)
-library(datasets)
+
 sessionInfo()
 ```
 
 If you don't get any output from the library(package) statement, it means everything is going well. Sometimes you'll get some output, loading statements and such, but as long as you don't see any errors, we should be good to go. So now we have everything set up, let's pull in the most important piece of the puzzle, your data. 
 
 ## 2. Objects, aka your data
-In order to analyze you data in R, you need to be able to load your data into R, and you need to know how to refer to it. So, let's read in some and give it a name. In this example, suppose you are in your working directory and it contains a .csv file named my_data.csv, the following code would read that in:
+In order to analyze you data in R, you need to be able to load your data into R, and you need to know how to refer to it. So, let's read in some and give it a name. In this example, suppose you are in your working directory and it contains a tab-delimited file named PCa_expression_data.tsv, the following code would read that in:
 
 ```{r}
-read_csv("my_data.csv")
-#Aakrosh: should we provide a small csv for this example? A stumbling point for new users could be reading in files, especially with and without headers.
+dat = read_tsv("PCa_expression_data.tsv")
 ```
 
-Of course no such file currently exists, so after the class, save an excel file with some data in it as a .csv file, put it in your working directory, and use this code to read it in. 
+This file is subset of the data from a manuscript on biorxiv (https://www.biorxiv.org/content/10.1101/604058v1.full). Today, we will look at normalized expression values of genes from a diagnostic panel that is currently used to determine Prostate cancer (PCa) prognosis in men with low or favorable intermediate risk disease. Some data exists that suggests the tests may provide inconsistent risk estimates in the presence of multifocal disease. But the data you will look at will be used to explore if the expression values for genes are different in African American men compared to European American men. Caution needs to be excercised in clinical decision making, and the risk scores determined from these tests need to be re-evaluated if there are statistically significant differences between the expression based on ancestry.
 
-For now we will read in a file that is built into R and is easy to learn with:
+`read_tsv` reads in the values from the file into what is called a `tibble`.
 
+We can rename our data to something more informative
 ```{r}
-data(mtcars)
+exp_data = dat
 ```
 
-When we run data(mtcars), we're telling the datasets package to give us the mtcars data. We can rename this object whatever we want, but most people will call their main table of data df, for data frame. The data frame is the type of object you will use the most in R. 
+When we run this line of code, we see a new object appear in our enivornment, called exp_data. What does exp_dat look like? Click on it in your environment box. A command should be run in the console that says View(exp_data), and you should see something that looks similar to an excel spreadsheet. Now we can just type in exp_data and R will know we are talking about this specific data. 
 
-So let's rename our data df. 
-
-```{r}
-df = mtcars
-#Aakrosh: Perhaps this is nitpicking, but maybe change "df" to somethinf like "cars_df", to emphasize the importance of clear variable/object names. 
-```
-
-When we run this line of code, we see a new object appear in our enivornment, called df. What does df look like? Click on it in your environment box. A command should be run in the console that says View(df), and you should see something that looks similar to an excel spreadsheet. Now we can just type in df and R will know we are talking about the mtcars data. When we read in mtcars, it reads in as data.frame, but we're going to convert it to a tibble, which is very similar to a dataframe, but is the format required for the packages we're going to use later. Tibbles also don't have rownames, so we're going to make a new column called rownames, so that information comes along. 
-
-```{r}
-df
-df = as.tibble(mtcars %>% rownames_to_column())
-df
-#Aakrosh: I think if we're going to focus on Tidyverse, this would be a good place to explain %>%, as it might not be completely intuitive.
-```
+Aside: We'll talk about this in a bit more depth later, but %>% is a TidyVerse operator called "pipe". Pipe takes the output of the expression preceding it, and applies the subsequent function to it.
 
 Typically, our data is so large that looking at it as a spreadsheet isn't very useful. So how can we look at and manipulate our data? By using functions.
 
 ## 3. Functions, aka how you do things with/to your data
 
-Now that we have what is essentially your excel spreadsheet in RStudio, let's figure out how to use functions to look at our data frame:
+Now that we have what is essentially your excel spreadsheet in RStudio, let's figure out how to use functions to look at our tibble:
 
-### (1) How big is our data frame?
+### (1) How big is our tibble?
 ```{r}
-dim(df)
+dim(exp_data)
+```
+The output tells us how many rows and columns this data contains
+
+### (2) What does our tibble look like?
+```{r}
+head(exp_data)
+
 ```
 
-### (2) What does our data frame look like?
-```{r}
-head(df)
-#Aakrosh: quickly introduce "tail"?
-```
+You can also use tail() to look at the bottom part of the data. Try it out.
 
 ### (3) How are the columns named? 
 ```{r}
-colnames(df)
+colnames(exp_data)
 ```
 
 ### (5) I'm curious about these columns. Can I find out what is in them easily? 
 ```{r}
-df$mpg
-df$carb
+exp_data$Race
+table(exp_data$Race)
 ```
 
 ## 4. Comments
 The final piece of any good script in R are comments. Comments have a '#' at the front of the line, and their purpose is to help you remember why you did things. When you are in the middle of analyzing your data, everything you are doing will seem so clear, but two months later when you're writing a methods section, you'll thank past you for writing really descriptive comments, that can help guide you through the code. For example:
 
 ```{r}
-### This is a comment, just to remind myself what I was up to. This command will take each column, and find the minimum value, the maxiumum value, and the quartiles. 
-summary(df)
+### This is a comment, just to remind myself what I was up to. This command will summarize each column. For numeric data, this will output the minimum value, the maxiumum value, and the 1st and 3rd quartiles. 
+summary(exp_data)
 ```
 
 # III. Analyzing your data:
@@ -131,26 +120,36 @@ Well we can start by manipulating our data so we can draw comparisons. There are
 To start, go to the files/plots/packages/etc. square and click on the packages tab. Then scroll down and click on the link for dplyr. This page shows you all of the functions available in dplyr. Click on any of these links to get information on how to use these functions. We're going to cover 5 basic functions from dplyr, because these 5 functions will cover a lot of what you need for basic data wrangling. 
 
 ## (1) select
-The select function allows you to essentially cut out just the specific columns you want to use. Let's look at an example. In mtcars we have the following columns:
+The select function allows you to essentially cut out just the specific columns you want to use. Let's look at an example. In our data, we have the following columns:
 
 ```{r}
-colnames(df)
+colnames(exp_data)
 ```
 
-Say we are specifically interested in the miles per gallon (mpg) compared to the weight (wt) of the car, we can simply use select to choose only those two columns of our data. The select function only needs to know the name of the data frame, in this case it's df, and the names of the columns that we want in our output, rownames, mpg, and wt. 
+Say we are specifically interested in the COL1A1 expression compared to the race of the sample, we can simply use select to choose only those two columns of our data. The select function only needs to know the name of the tibble, in this case it's exp_data, and the names of the columns that we want in our output: ID, Race and COL1A1 
 
 ```{r}
-select(.data = df, rowname, mpg, wt)
+select(.data = exp_data, ID, Race, COL1A1)
 ```
+
+Another way to accomplish the same would be to use the %>% operator. 
+```{r}
+exp_data %>% select(ID, Race, COL1A1)
+```
+
+The way to think about this is that you started out with your tibble, and you applied the 'select' function on it to limit the output to a few columns. See how if you do not specify `.data = exp_data` the function assumes that the input is coming from the expression preceding the pipe.
 
 Say we just want to remove one column as opposed to selecting all of the other columns. We can use select, but use the negative sign in front of one column name to remove it. 
 
 ```{r}
-select(df, -mpg)
+#output the tibble without the AZPG1 column
+select(exp_data, -AZGP1)
 ```
 
+Again, try using the %>% to accomplish the same as above.
+
 ## (2) filter
-The filter function allows us to choose certain rows from the data frame, based on some sort of filtering criterion. Filter needs to know two things; The first is the name of the data frame, again, df. The second is the filter parameter. The filter parameter is just a statement about the value of the column. You have 6 basic options: 
+The filter function allows us to choose certain rows from the tibble, based on some sort of filtering criterion. Filter needs to know two things; The first is the name of the tibble, again, exp_data. The second is the filter parameter. The filter parameter is just a statement about the value of the column. You have the following basic options: 
 (1) == means that the value must exactly equal the chosen value
 (2) != means that the value can be anything but the chosen value (essentially (!)not (=)equal to)
 (3) you can use < and <= for less than or less than or equal to
@@ -158,71 +157,83 @@ The filter function allows us to choose certain rows from the data frame, based 
 
 Let's look at some examples:
 
-For example, in mtcars, we may want to know only about cars have high horsepower.
+For example, in our data, we may want to know only about AAM data.
 
 ```{r}
-filter(df, hp > 200)
+filter(exp_data, Race == "AAM")
+```
+
+Can you use the %>% to do the same?
+
+Maybe we only want datapoints where TPM2 is at least 13
+
+```{r}
+filter(exp_data, TPM2 >= 13)
 ```
 
 ## (3) mutate
 The mutate function allows you to make a new column in your data frame based on an existing one. Mutate needs to know the name of the data frame you're taking data from and adding to, the name of the new column you're adding, and the value of that column.
 
-For example, weight in mtcars is actually scaled by 1000 lbs. Let's use mutate to make a new column of the weight of the car in pounds. 
+For example, lets use mutate to log transform AZGP1 expression. 
 
 ```{r}
-df$wt
-mutate(df, wt_lbs = wt * 1000)
+mutate(exp_data, AZGP1_log = log10(AZGP1))
+```
+
+The above is the same as 
+
+```{r}
+exp_data %>% mutate(AZGP1_log = log10(AZGP1))
 ```
 
 ## (4) group_by
-The group_by function allows you to group the rows based on the values in a particular column. For example, say you want to compare the horse power of each the cars that have different numbers of carburators. 
+The group_by function allows you to group the rows based on the values in a particular column. For example, say you want to compare expression by race
 
 ```{r}
-df$carb
-group_by(df, carb)
+group_by(exp_data, CAPRASgroup)
 ```
 
 The results of group_by aren't inherently useful, they don't reorder the table, but they add a layer of organization that can be used by other functions. In just a minute we'll start stacking these together to more interesting manipulations. 
 
 ## (5) summarize
-The summarize function take a data frame and summarizes it, but it won't summarize the whole thing; it needs you to group_by one of the variables and it will summarize each group--however you want to analyze them. So how do we stack two steps together? There's a symbol called a pipe, or %>%. This takes the output of one line, and sticks it into another function. 
+The summarize function takes a tibble and summarizes it, but it won't summarize the whole thing; it needs you to group_by one of the variables and it will summarize each group--however you want to analyze them. So how do we stack two steps together? There's a symbol called a pipe, or %>%. This takes the output of one line, and sticks it into another function. 
 
 Let's look at an example:
 
 ```{r}
-df %>%
-  group_by(carb) %>%
-  summarise(mean_hp = mean(hp))
+exp_data %>%
+  group_by(CAPRASgroup) %>%
+  summarize(median(S1PR4))
 ```
 
-So the pipe takes the data frame from line one, and automatically puts it into the group_by function, where we add in the carb option to group by, and then takes the carb grouped data frame and puts it into summarise, where we put in one more parameter, that we want to calculate the mean miles per gallon of each group by the number of carberators. But usually we don't want just one function and one variable to be summarized. 
+So the pipe takes the data from line one, and sends it into the group_by function, where we add in the CAPRA-S group option to group by, and then takes the grouped data  and puts it into summarize, where we put in one more parameter, that we want to calculate the median expression of S1PR4. The output iis the median of S1PR4 expression for each group. But usually we don't want just one function and one variable to be summarized. 
 
-We can use summarize_at, and the funs() option to do a few functions on a few variables. 
+We can use summarize_at, and a list of functions to apply them on a few variables. 
 
 ```{r}
-df %>%
-  group_by(carb) %>%
-  summarise_at(vars(mpg, disp), funs(min, mean, max))
+exp_data %>%
+  group_by(CAPRASgroup) %>%
+  summarize_at(vars(S1PR4, COL1A1), list(minimum=min, mean=mean, maximum=max))
 ```
 
 # IV. Plotting your data:
-So we got a ton of data, and we want to see what it looks like. While there are built in packages that can do this for you, the package ggplot2 is the best R package for making publication quality plots. 
+So we got a ton of data, and we want to see what it looks like. While there are built in packages that can do this for you, the package ggplot2 is one such R package for making publication quality plots. 
 
-What does ggplot need to know to make your plot?
+What does ggplot2 need to know to make your plot?
 
-The first step is to tell ggplot the name of the data frame your data is coming from, and you need to tell it the "aesthetics" you want, so tell it what you want along the x axis, and what you want on the y axis. Then we save that all to an object, which I called g. Here's a sort of template for what that looks like:
+The first step is to tell ggplot the name of the tibble your data is coming from, and you need to tell it the "aesthetics" you want, so tell it what you want along the x axis, and what you want on the y axis. Then we save that all to an object, which I called "g". Here's a sort of template for what that looks like:
 
 g = ggplot("name of data frame here", aes("x variable column name here","y variable column name here"))
 
 So what can we plot in our example data frame? We can see our options by viewing the column names of our data frame.
 ```{r}
-colnames(df)
+colnames(exp_data)
 ```
 
-Let's have ggplot make a plot of the miles per gallon (mpg) of the car compared to the weight of the car (wt). 
+Let's have ggplot make a plot of COL1A1 vs S1PR4 expression 
 
 ```{r}
-g = ggplot(df, aes(wt,mpg))
+g = ggplot(exp_data, aes(S1PR4,COL1A1))
 ```
 
 So we typed that in, but what actually happened? Nothing came out in the console, but our g object did show up in our environment. Let's try to look at it.
@@ -231,46 +242,46 @@ So we typed that in, but what actually happened? Nothing came out in the console
 g 
 ```
 
-Well that looks like the plot we want to make, but there's nothing on it. That's because we need to add something called a layer. So we have the ggplot function, with the aes inside that tells the program what the x and y axes should be, and then there's the "geom" component, and that is how we will indicate what we want the data to look like on the plot. And we've given you a cheat sheet for how to choose various types of "geoms". The options are ones you're familiar with, like geom_point will give you a scatter plot, and geom_box will give you a box plot. Let's add a geom_point layer to our graph so we can see the data. 
+Well that looks like the plot we want to make, but there's nothing on it. That's because we need to add something called a layer. So we have the ggplot function, with the aes inside that tells the program what the x and y axes should be, and then there's the "geom" component, and that is how we will indicate what we want the data to look like on the plot. And we've given you a cheat sheet for how to choose various types of "geoms". The options are ones you're familiar with, like geom_point will give you a scatter plot, and geom_boxplot will give you a box plot. Let's add a geom_point layer to our graph so we can see the data. 
 
 ```{r}
 ### We start again with the command, the data frame, and the two variables we want to plot.
-g = ggplot(df, aes(wt,mpg))
+g = ggplot(exp_data, aes(S1PR4,COL1A1))
 ### Next, we add the geom layer, we just rename our object g as the first line + a geom layer
 g = g + geom_point()
 ### Finally, we look at the plot!
 g
 ```
 
-Now we can tell that there's a correlation between the mpg and the wt of the car. But what if we want to fit a line to this data, just to visualize the trend? We can add a layer called geom_smooth, just like geom_point, and looking at the plot, we can try to fit a linear model, so we tell geom_smooth that it should use method = lm, for linear model. 
+Now we can tell that there's a correlation between the the two genes. But what if we want to fit a line to this data, just to visualize the trend? We can add a layer called geom_smooth, just like geom_point, and looking at the plot, we can try to fit a linear model, so we tell geom_smooth that it should use method = lm, for linear model. 
 
 ```{r}
 ### We start again with the command, the data frame, and the two variables we want to plot.
-g = ggplot(df, aes(wt,mpg)) 
+g = ggplot(exp_data, aes(S1PR4,COL1A1))
 ### Next, we add the geom layer, we just rename our object g as the first line + a geom layer
 g = g + geom_point() + geom_smooth(method = lm)
 ### Finally, we look at the plot!
 g
 ```
 
-Let's try it again, but this time with different variables. Let's look at the relationship between the number of caberators and miles per gallon. Let's just plug it in to the last command we used. 
+Let's try it again, but this time with different variables. Let's look at the relationship between race and COL1A1 expression. Let's just plug it in to the last command we used. 
 
 ```{r}
 ### We start again with the command, the data frame, and the two variables we want to plot.
-g = ggplot(df, aes(carb,mpg))
+g = ggplot(exp_data, aes(Race,COL1A1))
 ### Next, we add the geom layer, we just rename our object g as the first line + a geom layer
 g = g + geom_point()
 ### Finally, we look at the plot!
 g
 ```
 
-Well that's not quite what we want... Clearly the wrong geom. With one discrete variable and one continuout variable, we should plot this as a box_plot. 
+Well that's not quite what we want... Clearly the wrong geom. With one discrete variable and one continuous variable, we should plot this as a box_plot. 
 
 ```{r}
 ### We start again with the command, the data frame, and the two variables we want to plot.
-g = ggplot(df, aes(carb,mpg))
+g = ggplot(exp_data, aes(Race,COL1A1))
 ### Next, we add the geom layer, we just rename our object g as the first line + a geom layer
-g = g + geom_boxplot(aes(group = carb))
+g = g + geom_boxplot()
 ### Finally, we look at the plot!
 g
 ```
@@ -279,9 +290,9 @@ The boxplot is nice, but what if we want to know more about the specific data po
 
 ```{r}
 ### We start again with the command, the data frame, and the two variables we want to plot.
-g = ggplot(df, aes(carb,mpg))
+g = ggplot(exp_data, aes(Race,COL1A1))
 ### Next, we add the geom layer, we just rename our object g as the first line + a geom layer
-g = g + geom_boxplot(aes(group = carb)) + geom_point()
+g = g + geom_boxplot() + geom_point()
 ### Finally, we look at the plot!
 g
 ```
@@ -289,70 +300,83 @@ g
 Finally, let's clean up the labels, so everyone who looks at it knows what it represents!
 ```{r}
 ### We start again with the command, the data frame, and the two variables we want to plot.
-g = ggplot(df, aes(carb,mpg))
+g = ggplot(exp_data, aes(Race,COL1A1))
 ### Next, we add the geom layer, we just rename our object g as the first line + a geom layer
-g = g + geom_boxplot(aes(group = carb)) + geom_point()
+g = g + geom_boxplot() + geom_point()
 ### Next, let's change the axes
-g = g + xlab("# of carburators") + ylab("miles per gallon")
+g = g + xlab("Sample Race") + ylab("COL1A1 expression")
 ### Finally, we look at the plot!
 g
 ```
 These are just some basic plots we can make using ggplots. and if you want to do more with your ggplot, the easiest way to figure out how to do it is to google what you want to do. For example, just type in "color the points by a certain column in ggplot2", or "changing the x and y axis titles in ggplot2". One of the top three hits will likely be an in depth tutorial that can help you build whatever plot you want. 
 
+
+
 # V. One Final Example
 
 So let's play around with some of our data using dplyr and then plot it.
 
-Question: In automatic cars, does the average gas mileage differ based on the number of carberators it has?
+Question: In patients with High CAPRA-S risk, does the median expression of COL1A1 differ based on race?
 
 To go about answering this question, we can break it down into steps:
  # start with our whole data frame  
- # filter out our results to get automatic cars (am == 1)  
- # group the data by the number of carberators   
- # summarize each group  
- # now plot the mean mpg   
+ # filter out our results to get high CAPRA-S risk group (CAPRASgroup == "HIGH")  
+ # now plot the COL1A1
  # add the geom layer   
  # add axis labels   
 ```{r, echo=TRUE}
-df %>% 
-  filter(am == 1) %>% 
-  group_by(carb) %>% 
-  summarise(mpg_mean = mean(mpg)) %>% 
-  ggplot(aes(carb, mpg_mean, group = carb)) + 
-  geom_point() + 
-  labs(x="number of Carberators", y="mean mpg")
+exp_data %>% 
+  filter(CAPRASgroup == "HIGH") %>% 
+  ggplot(aes(Race, COL1A1)) + 
+  geom_boxplot() + 
+  geom_point() +
+  labs(x="Race", y="COL1A1 expression - High CAPRA-S")
 ```
+Ok, this is cool, but what if we want to compare all CAPRA-S groups at the same time?
+We can use facets. Facets allow us to form panels in our plots.
+In the following example, we supply CAPRA-S groups as variables for faceting. Each facet will display the data for one CAPRA-S group "variable"
 
+
+```{r}
+exp_data %>% 
+  ggplot(aes(Race, COL1A1)) + 
+  geom_boxplot() + 
+  geom_point() +
+  facet_grid(cols = vars(CAPRASgroup))+
+  labs(x="Race", y="COL1A1 expression - High CAPRA-S")
+```
 If you want to explore more of the options you have with ggplot2, refer to the cheat sheet we distributed as well. You can also always find that sheet by googling ggplot2 cheat sheet. 
 
 # VI. One Last Thing: Statistics
 We would be remiss if we taught you about R and did not mention that you can use it to do statistical analysis on your data as well. 
 
-Remember the example above, where we plotted the weight of the car against the miles per gallon? We added a line to the data to look at the relationship between the two variables, but what if we actually wanted to use that line to be able to predict the mpg of another car based on its weight. We would need a formula. And the command if pretty easy, its just lm() for linear model. 
+Remember the example above, where we plotted COL1A1 and S1PR4 expression? We added a line to the data to look at the relationship between the two variables, but what if we actually wanted to use that line to be able to predict expression of COL1A1 based on S1PR4 expression. We would need a formula. And the command if pretty easy, its just lm() for linear model. 
 ```{r}
 ### We start again with the command, the data frame, and the two variables we want to plot.
-g = ggplot(df, aes(wt,mpg)) 
+g = ggplot(exp_data, aes(S1PR4,COL1A1))
 ### Next, we add the geom layer, we just rename our object g as the first line + a geom layer
 g = g + geom_point() + geom_smooth(method = lm)
 ### Finally, we look at the plot!
 g
-
 ### To calculate the equation of the line:
-lm(mpg~wt, df)
+lm(COL1A1~S1PR4, exp_data)
 
 ### So we now know that the relationship between mpg and wt is 
-### mpg = -5.344*wt + 37.285
+###COL1A1 = 0.4027*S1PR4 + 8.8656 
 ```
 
-One other common statistical test you may want to use is a t test, to compare two groups of measurements. We can look at the difference between mpg for automatic and manual shifitng cars, coded by column "am".
+One other common statistical test you may want to use is a t test, to compare two groups of measurements. We can look at the difference between S1PR4 expression for AAM and EAM.
 ```{r}
-# There is a significant difference between the mean mpg for manual and automatic cars, can we plot that as well?
-g = ggplot(df, aes(am,mpg)) +
-  geom_boxplot(aes(group = am)) +
+# We want to know if y (S1PR4) differs by x(Race)
+# Null hypothesis: equal means between populations
+t.test(S1PR4~Race, exp_data)
+
+# There is a significant difference in S1PR4 expression between races, can we plot that as well?
+g = ggplot(exp_data, aes(Race,S1PR4)) +
+  geom_boxplot() +
   geom_point()
 g
-# We want to know if y (mpg) differs by x(am)
-t.test(mpg~am, df)
+
 ```
 
 I hope this tutorial was a helpful introduction to RStudio, dplyr, and ggplots. If you want to learn more, there are a lot of classes available from the Stat Lab and Bioconnector at the Health Science Library. All of these resources take what we just presented and help you to build on them.
