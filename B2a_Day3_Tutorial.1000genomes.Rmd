@@ -23,7 +23,6 @@ Load the libraries that we will use throughout this tutorial
 
 ```{r}
 library(tidyverse)
-library(magrittr)
 library(broom)
 ```
 
@@ -34,30 +33,28 @@ Read in the data file with the genotypes. Remember, we have the column names in 
 data = read_tsv('Genomes.annotated.txt.gz')
 ```
 
-Let us look at the first few lines of the dataframe. You can use 'head' to look at the beginning, and 'tail' to look at the end of the dataframe. Look at the help section for 'head' to see how you would control the number of rows you can see using the command.
+Let us look at the first few lines of the tibble. You can use 'head' to look at the beginning, and 'tail' to look at the end of the tibble. Look at the help section for 'head' to see how you would control the number of rows you can see using the command.
 
 ```{r}
 head(data)
 ```
 
-
 Let us read the metadata information from the file. Remember in this case, the file does not have the names of the columns. So we will use set_colnames to set those. Note that we have to specify 'col_names = F' with 'read_tsv' . What would happen if we do not specify 'col_names = F'?
 
 ```{r}
 # get the population information
-pop = read_tsv('metadata.txt', col_names = F) %>%
-  set_colnames(c('sample','population','human'))
+pop = read_tsv('metadata.txt', col_names = F) %>% set_colnames(c('sample','population','human'))
 ```
 
-Again, lets look at the dataframe. This time we will peek at the first 10 rows.
+Again, lets look at the tibble. This time we will peek at the first 10 rows.
 
 ```{r}
 head(pop, n = 10)
 ```
 
-We have two dataframes; one specifying the raw data, and the other one specifying the associated metadata. Storing files this way makes sense, but when exploring and manipulating it is easier to work with a single dataframe that encapsulates all the data we are interested in. 
+We have two tibbles; one specifying the raw data, and the other one specifying the associated metadata. Storing files this way makes sense, but when exploring and manipulating it is easier to work with a single tibble that encapsulates all the data we are interested in. 
 
-But before we attempt to combine the two dataframes, we should convert these dataframes to conform to the tenets of 'tidy data'. Please read the article https://www.jstatsoft.org/article/view/v059i10 to understand the basic idea and philosophy behind tidy data. 
+But before we attempt to combine the two tibbles, we should convert these tibbles to conform to the tenets of 'tidy data'. Please read the article https://www.jstatsoft.org/article/view/v059i10 to understand the basic idea and philosophy behind tidy data. 
 
 In brief, the basic principles of tidy data are:
 
@@ -82,22 +79,21 @@ Lets look at the first few lines of this clean dataset
 head(clean_data)
 ```
 
-Now look at the 'pop' dataframe. Do we need to do anything to it to 'clean' it?
+Now look at the 'pop' tibble. Do we need to do anything to it to 'clean' it?
 
-### Creating a single dataframe
+### Creating a single tibble
 
-We will use an inner join to combine the 'clean_data' dataframe with the 'pop' dataframe
+We will use an inner join to combine the 'clean_data' tibble with the 'pop' tibble
 
 ```{r}
 df = clean_data %>%
-  inner_join(pop, by = 'sample')
+     inner_join(pop, by = 'sample')
 ```
 
-Let us look at the first few lines of the resulting dataframe. 
+Let us look at the first few lines of the resulting tibble. 
 ```{r}
 head(df)
 ```
-
 
 ### SNPs per genome
 
@@ -117,6 +113,7 @@ df %>%
 ```
 
 Can you change the Y-axis to start from 0 instead of 65,000?
+
 What happens when you include the ancient DNA samples?
 
 ### Allele frequencies
@@ -268,7 +265,6 @@ dim(sites2)
 ```
 
 
-
 ```{r}
 
 x = sites1 %>%
@@ -293,9 +289,9 @@ So the neanderthal component in GBR population is clearly visible. But JPT and Y
 
 ### More resources
 
-#### STATLAB and BIOCONNECTOR COURSES
+#### STATLAB COURSES
 http://data.library.virginia.edu/training/
-  Intro to R is Thursday, 9/6 (10:00 - 11:30)
+  Intro to R 
   Data Wrangling with R, Part I 
   Unix: Introduction to the Command Line
   Data Wrangling with R, Part II
@@ -303,7 +299,7 @@ http://data.library.virginia.edu/training/
   Introduction to Git/GitHub
   Data Visualization in R 
   Qualitative Data Analysis
-  and many more!!! (http://cal.hsl.virginia.edu)
+  and many more!!! 
   
 #### ONLINE RESOURCES
 
@@ -314,6 +310,8 @@ https://github.com/fivethirtyeight/data Fun datasets to analyze and improve your
 http://www.pewresearch.org/download-datasets More data from the Pew Research Center
 
 ### CONTACT INFO
-Dr. Aakrosh Ratan ar7jq at virginia dot edu
+Dr. Aakrosh Ratan 
+ar7jq at virginia dot edu
 
-Olivia Sabik ols5fg at virginia dot edu
+Basel Al-Barghouthi 
+bma8ne at virginia dot edu
