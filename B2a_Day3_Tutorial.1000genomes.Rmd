@@ -23,7 +23,6 @@ Load the libraries that we will use throughout this tutorial
 
 ```{r}
 library(tidyverse)
-library(broom)
 ```
 
 
@@ -39,11 +38,12 @@ Let us look at the first few lines of the tibble. You can use 'head' to look at 
 head(data)
 ```
 
-Let us read the metadata information from the file. Remember in this case, the file does not have the names of the columns. So we will use set_colnames to set those. Note that we have to specify 'col_names = F' with 'read_tsv' . What would happen if we do not specify 'col_names = F'?
+Let us read the metadata information from the file. Remember in this case, the file does not have the names of the columns. So we will read the data, and `rename` the columns to something sensible. Note that we have to specify 'col_names = F' with 'read_tsv' . What would happen if we do not specify 'col_names = F'?
 
 ```{r}
 # get the population information
-pop = read_tsv('metadata.txt', col_names = F) %>% set_colnames(c('sample','population','human'))
+pop = read_tsv('metadata.txt', col_names = F) %>%
+      rename("sample"="X1", "population"="X2","human"="X3")
 ```
 
 Again, lets look at the tibble. This time we will peek at the first 10 rows.
@@ -90,6 +90,8 @@ df = clean_data %>%
      inner_join(pop, by = 'sample')
 ```
 
+joins refer to functions that are used to combine information between two different tables. Both those tables should have at least one column that is the same. In the above example, it is the column 'sample'.
+
 Let us look at the first few lines of the resulting tibble. 
 ```{r}
 head(df)
@@ -97,7 +99,7 @@ head(df)
 
 ### SNPs per genome
 
-In the morning lecture on Genome Variation, we talked about how founder-effect can lead to lower diversity in the migrant populations. Modern humans originated in Africa and migrated to inhabit the other parts of the world. Based on that information, it is reasonable to assume that African individuals should have more SNVs compared to Europeans and Asians. How can you use the above data to plot the number of SNVs per modern human individual grouped by population.
+In the lecture on Genome Variation, we talked about how founder-effect can lead to lower diversity in the migrant populations. Modern humans originated in Africa and migrated to inhabit the other parts of the world. Based on that information, it is reasonable to assume that African individuals should have more SNVs compared to Europeans and Asians. How can you use the above data to plot the number of SNVs per modern human individual grouped by population.
 
 ```{r}
 df %>%
@@ -109,10 +111,14 @@ df %>%
   summarise(numsnps = sum(n)) %>%
   ggplot(aes(sample,numsnps,group = population, color = population)) + geom_boxplot() + 
     geom_jitter() + 
-    theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank()) 
+    theme(axis.title.x=element_blank(), 
+          axis.text.x=element_blank(), 
+          axis.ticks.x=element_blank()) 
 ```
 
 Can you change the Y-axis to start from 0 instead of 65,000?
+
+Note the use of theme. You can use that to change the appearance of the plots.
 
 What happens when you include the ancient DNA samples?
 
@@ -139,7 +145,7 @@ PCA is useful for dimension reduction. Let us say I have a 2-D dataset, and I wa
 
 * An excellent visual explanation of PCA is shown here: http://setosa.io/ev/principal-component-analysis/
 
-In this case, we will use a command that is not part of tidyverse (prcomp), but it is used very frequently. Therefore a verb 'tidy' has been introduced as part of the 'broom' package to clean up such analyses. You will find similar functions to clean up data structures from gene-expression analyses for example.
+In this case, we will use a function that is not part of tidyverse named prcomp. Look up the help page for prcomp and understand the options available to you, and the input data format that is expected.
 
 ```{r}
 # we only want to look at modern humans
@@ -148,16 +154,14 @@ modern = data[,c(7:ncol(data))]
 pca = prcomp(t(modern))
 
 # lets tidy and plot it
-pca %>%
-  tidy(matrix = "samples") %>%
-  filter(PC == 1 | PC == 2)  %>%
-  spread(PC,value) %>%
-  set_colnames(c('sample','PC1','PC2')) %>%
+pca$x %>%
+  as_tibble(rownames = "sample") %>%
+  select(sample, PC1, PC2) %>%
   inner_join(pop) %>%
   ggplot(aes(PC1, PC2,color = population)) + geom_point()
 ```
 
-Here we plot the 1st and the 2nd principal component. Can you plot the 2nd and the 3rd instead?
+Here we plot the 1st and the 2nd principal component. Can you plot the 2nd and the 3rd instead? as_tibble is a handy function that can coerce list, matrices, and several other data types into tibbles (our favorite datatype)
 
 ### f2 variants
 
@@ -202,11 +206,9 @@ Lets see if we can use some plots to see if the above statements appear to be tr
 
 ```{r}
 pca = prcomp(t(data[,c(4,5,6)]), retx = TRUE, center = T)
-pca %>%
-  tidy(matrix = "samples") %>%
-  filter(PC == 1 | PC == 2)  %>%
-  spread(PC,value) %>%
-  set_colnames(c('sample','PC1','PC2')) %>%
+pca$x %>%
+  as_tibble(rownames = "sample") %>%
+  select(sample, PC1, PC2) %>%
   inner_join(pop) %>%
   ggplot(aes(PC1, PC2,color = sample)) + geom_point()
 
@@ -217,26 +219,15 @@ Now if we project the modern samples on to this 'view'. 'predict' is used for th
 ```{r}
 predictions = predict(pca, t(data[,c(4:ncol(data))]))
 
-as.data.frame(predictions) %>%
-  rownames_to_column() %>%
-  set_colnames(c('sample', 'PC1', 'PC2', 'PC3')) %>%
+predictions %>%
+  as_tibble(rownames="sample") %>%  
   inner_join(pop) %>%
   ggplot(aes(PC1, PC2,color = population)) + geom_point() 
 ```
 
-As you can see, human samples clump together. But what if we get really close. Axes can be controlled using 'xlim' and 'ylim' commands.
+As you can see, modern human samples clump together. 
 
-```{r}
-as.data.frame(predictions) %>%
-  rownames_to_column() %>%
-  set_colnames(c('sample', 'PC1', 'PC2', 'PC3')) %>%
-  inner_join(pop) %>%
-  ggplot(aes(PC1, PC2,color = population)) + geom_point() + xlim(-150,-75) + ylim(-20,0)
-```
-
-All right. So it does seem that Africans are moving away from the Neanderthals.
-
-Now lets see if we can use some numbers to convince us of the above. This section follows the analysis that has been detailed in the wonderful blog post here: http://johnhawks.net/weblog/reviews/neandertals/pigmentation/neandertal-introgression-1000-genomes-style-2011.html. 
+Now lets see if we can use some numbers to convince us of introgression patterns. This section follows the analysis that has been detailed in the wonderful blog post here: http://johnhawks.net/weblog/reviews/neandertals/pigmentation/neandertal-introgression-1000-genomes-style-2011.html. 
 
 The basic idea is as follows: Let us find the derived SNP alleles that are present in Neanderthals and not present in the human-chimp ancestor. We can then count the number of them that are in each of the modern  human sequences. If one sequence has significantly more Neandertal derived alleles than another, then it got it somehow...
 
