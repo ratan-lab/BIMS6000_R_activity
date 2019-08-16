@@ -310,7 +310,12 @@ g
 ```
 These are just some basic plots we can make using ggplots. and if you want to do more with your ggplot, the easiest way to figure out how to do it is to google what you want to do. For example, just type in "color the points by a certain column in ggplot2", or "changing the x and y axis titles in ggplot2". One of the top three hits will likely be an in depth tutorial that can help you build whatever plot you want. 
 
+Now, we have used plots for data exploration, but what about the scientific question? Is there a statistically significant difference between the expression of COL1A1 between African Americans (AAM) and European Americans (EAM)? We can use a t.test to find out (We can dicuss later whether t.test is the right statistical test for this question, but this more to illustrate that application of statistical tests on these data is relatively straightforward). The null hypothesis for this test is that there is no difference between the two groups. 
 
+```
+?t.test
+t.test(COL1A1 ~ Race, data=exp_data)
+```
 
 # V. One Final Example
 
@@ -347,37 +352,7 @@ exp_data %>%
 ```
 If you want to explore more of the options you have with ggplot2, refer to the cheat sheet we distributed as well. You can also always find that sheet by googling ggplot2 cheat sheet. 
 
-# VI. One Last Thing: Statistics
-We would be remiss if we taught you about R and did not mention that you can use it to do statistical analysis on your data as well. 
-
-Remember the example above, where we plotted COL1A1 and S1PR4 expression? We added a line to the data to look at the relationship between the two variables, but what if we actually wanted to use that line to be able to predict expression of COL1A1 based on S1PR4 expression. We would need a formula. And the command if pretty easy, its just lm() for linear model. 
-```{r}
-### We start again with the command, the data frame, and the two variables we want to plot.
-g = ggplot(exp_data, aes(S1PR4,COL1A1))
-### Next, we add the geom layer, we just rename our object g as the first line + a geom layer
-g = g + geom_point() + geom_smooth(method = lm)
-### Finally, we look at the plot!
-g
-### To calculate the equation of the line:
-lm(COL1A1~S1PR4, exp_data)
-
-### So we now know that the relationship between mpg and wt is 
-###COL1A1 = 0.4027*S1PR4 + 8.8656 
-```
-
-One other common statistical test you may want to use is a t test, to compare two groups of measurements. We can look at the difference between S1PR4 expression for AAM and EAM.
-```{r}
-# We want to know if y (S1PR4) differs by x(Race)
-# Null hypothesis: equal means between populations
-t.test(S1PR4~Race, exp_data)
-
-# There is a significant difference in S1PR4 expression between races, can we plot that as well?
-g = ggplot(exp_data, aes(Race,S1PR4)) +
-  geom_boxplot() +
-  geom_point()
-g
-
-```
+Now that you know how to do a boxplot for one gene, you should try to create a figure which shows the boxplots for all genes in your tibble. Hint: Use facet_grid (as you did above) or facet_wrap. Similarly, try to figure out how you would do a t.test for each gene. You could use `filter` and do this one gene at a time, but is there a better way? 
 
 I hope this tutorial was a helpful introduction to RStudio, dplyr, and ggplots. If you want to learn more, there are a lot of classes available from the Stat Lab and Bioconnector at the Health Science Library. All of these resources take what we just presented and help you to build on them.
 
@@ -386,17 +361,17 @@ I hope this tutorial was a helpful introduction to RStudio, dplyr, and ggplots. 
 ### R Studio Online Learning
 https://www.rstudio.com/online-learning/
 
+### Tidyverse 
+https://r4ds.had.co.nz/
+
 ### STATLAB COURSES
 http://data.library.virginia.edu/training/
-Fall 2018 dates posted now!
-
-### BIOCONNECTOR COURSES
-http://cal.hsl.virginia.edu/calendar/bioconnector?cid=5619&t=d&d=0000-00-00&cal%5B%5D=5619
-Fall 2018 posted now!
+Fall 2019 dates posted now!
 
 ### STATISTICS RESOURCE
 An Introduction to Statistical Learning
 https://www-bcf.usc.edu/~gareth/ISL/ISLR%20First%20Printing.pdf
+
 
 ## CONTACT INFO
 
@@ -408,7 +383,3 @@ crf2s at virginia dot edu
 
 Basel Al-Barghouthi
 bma8ne at virginia dot edu
-
-
-
-
