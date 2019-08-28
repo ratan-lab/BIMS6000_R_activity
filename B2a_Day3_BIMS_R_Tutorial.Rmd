@@ -3,7 +3,6 @@ title: "BIMS 6000 R Tutorial 2019"
 author: Basel Al-Barghouthi
 output: html_notebook
 ---
-
 # I. Introduction to R and RStudio
 
 Welcome to R, more specifically, to RStudio. Let me give you an introduction to your surroundings. 
@@ -86,7 +85,7 @@ The output tells us how many rows and columns this data contains
 
 ### (2) What does our tibble look like?
 ```{r}
-head(exp_data)
+head(exp_data,n = 10)
 
 ```
 
@@ -108,7 +107,7 @@ The final piece of any good script in R are comments. Comments have a '#' at the
 
 ```{r}
 ### This is a comment, just to remind myself what I was up to. This command will summarize each column. For numeric data, this will output the minimum value, the maxiumum value, and the 1st and 3rd quartiles. 
-summary(exp_data)
+summary(exp_data$COL1A1)
 ```
 
 # III. Analyzing your data:
@@ -130,6 +129,7 @@ Say we are specifically interested in the COL1A1 expression compared to the race
 
 ```{r}
 select(.data = exp_data, ID, Race, COL1A1)
+
 ```
 
 Another way to accomplish the same would be to use the %>% operator. 
@@ -145,7 +145,6 @@ Say we just want to remove one column as opposed to selecting all of the other c
 #output the tibble without the AZPG1 column
 select(exp_data, -AZGP1)
 ```
-
 Again, try using the %>% to accomplish the same as above.
 
 ## (2) filter
@@ -183,7 +182,7 @@ mutate(exp_data, AZGP1_log = log10(AZGP1))
 The above is the same as 
 
 ```{r}
-exp_data %>% mutate(AZGP1_log = log10(AZGP1))
+potato = exp_data %>% mutate(AZGP1_log = log10(AZGP1))
 ```
 
 ## (4) group_by
@@ -213,7 +212,7 @@ We can use summarize_at, and a list of functions to apply them on a few variable
 ```{r}
 exp_data %>%
   group_by(CAPRASgroup) %>%
-  summarize_at(vars(S1PR4, COL1A1), list(minimum=min, mean=mean, maximum=max))
+  summarize_at(vars(S1PR4, COL1A1,ANO7), list(apple=min, potato=mean, tomato=max))
 ```
 
 # IV. Plotting your data:
@@ -279,7 +278,7 @@ Well that's not quite what we want... Clearly the wrong geom. With one discrete 
 
 ```{r}
 ### We start again with the command, the data frame, and the two variables we want to plot.
-g = ggplot(exp_data, aes(Race,COL1A1))
+g = ggplot(exp_data, aes(CAPRASgroup,S1PR4))
 ### Next, we add the geom layer, we just rename our object g as the first line + a geom layer
 g = g + geom_boxplot()
 ### Finally, we look at the plot!
@@ -310,12 +309,6 @@ g
 ```
 These are just some basic plots we can make using ggplots. and if you want to do more with your ggplot, the easiest way to figure out how to do it is to google what you want to do. For example, just type in "color the points by a certain column in ggplot2", or "changing the x and y axis titles in ggplot2". One of the top three hits will likely be an in depth tutorial that can help you build whatever plot you want. 
 
-Now, we have used plots for data exploration, but what about the scientific question? Is there a statistically significant difference between the expression of COL1A1 between African Americans (AAM) and European Americans (EAM)? We can use a t.test to find out (We can dicuss later whether t.test is the right statistical test for this question, but this more to illustrate that application of statistical tests on these data is relatively straightforward). The null hypothesis for this test is that there is no difference between the two groups. 
-
-```
-?t.test
-t.test(COL1A1 ~ Race, data=exp_data)
-```
 
 # V. One Final Example
 
@@ -348,13 +341,29 @@ exp_data %>%
   geom_boxplot() + 
   geom_point() +
   facet_grid(cols = vars(CAPRASgroup))+
-  labs(x="Race", y="COL1A1 expression - High CAPRA-S")
+  labs(x="Race", y="COL1A1 expression - CAPRA-S")
 ```
 If you want to explore more of the options you have with ggplot2, refer to the cheat sheet we distributed as well. You can also always find that sheet by googling ggplot2 cheat sheet. 
 
 Now that you know how to do a boxplot for one gene, you should try to create a figure which shows the boxplots for all genes in your tibble. Hint: Use facet_grid (as you did above) or facet_wrap. Similarly, try to figure out how you would do a t.test for each gene. You could use `filter` and do this one gene at a time, but is there a better way? 
 
 I hope this tutorial was a helpful introduction to RStudio, dplyr, and ggplots. If you want to learn more, there are a lot of classes available from the Stat Lab and Bioconnector at the Health Science Library. All of these resources take what we just presented and help you to build on them.
+
+
+#Challenge Problem!
+Now, we have used plots for data exploration, but what about the scientific question? Is there a statistically significant difference in gene expression between African Americans (AAM) and European Americans (EAM)? We can use a t.test to find out (We can dicuss later whether t.test is the right statistical test for this question, but this more to illustrate that application of statistical tests on these data is relatively straightforward). The null hypothesis for this test is that there is no difference between the two groups. 
+
+The challenge is to perform this test for ALL genes at the same time.
+
+Hint 1: The following will perform a t-test for COL1A1 by race
+
+```{r}
+?t.test
+t.test(COL1A1 ~ Race, data=exp_data)
+```
+
+
+Hint 2: Use facets to plot your in one plot. You may have to subset your data (ex. 8 genes per plot) so your figure doesn't get too busy. Use select() for this filtration.
 
 ## RESOURCES
 
