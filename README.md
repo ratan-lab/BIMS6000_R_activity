@@ -8,7 +8,9 @@ The following files need to be updated and uploaded to Collab:
     * Convert to PDF using pandoc with the following command
 
 ```
-pandoc B2a_Day4_Preclass_Setup.md -V geometry:margin=1in --pdf-engine=xelatex -o B2a_Day4_Preclass_Setup.pdf
+pandoc --lua-filter=meta-vars.lua -t markdown B2a_Day4_Preclass_Setup.md \
+ | pandoc -V geometry:margin=1in --pdf-engine=xelatex \
+   -o B2a_Day4_Preclass_Setup.pdf
 ```
 
 2. B2a_Day4_R_Tutorial.Rmd
