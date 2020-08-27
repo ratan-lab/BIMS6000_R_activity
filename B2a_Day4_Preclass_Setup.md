@@ -83,4 +83,4 @@ and then enter that line (command +enter for mac, or ctrl +enter for PC). Your c
 
    j. In RStudio, click on File and then Open File... and open the BIMS\_R\_Tutorial.Rmd file in RStudio. We'll be working through this document for the tutorial.
 
-   k. If you have any problems, help with the installation will be available at the lunch hour on the 29^th^. The best way to approach having any problem with bioinformatics is to find someone else running the same operating system as you, who has successfully completed the download. They will be well equipped to help you, especially if you are using PC.
+   k. If you have any problems, help with the installation will be available at the lunch hour on the date the activity is scheduled. The best way to approach having any problem with bioinformatics is to find someone else running the same operating system as you, who has successfully completed the download. They will be well equipped to help you, especially if you are using PC.
