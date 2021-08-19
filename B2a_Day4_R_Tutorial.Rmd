@@ -35,7 +35,7 @@ setwd("C:\Users\(username)\Desktop")
 
 Of course this path doesn't exist on your computer, so try changing that path to your own desktop. To do so, just start with setwd("/") and with your cursor after the backslash, hit the TAB button. This will let you see all the directories available to you. You can also go to the files tab and set your working directory there.
 
-We'll also need to install whatever packages we want to use. R comes with some built in features, but the beauty of R is that there are tons of researchers who are actively developing software that you can use to do your work in R. Installing packages is super easy. Here is an example:
+We'll also need to install whatever packages we want to use. R comes with some built in features, but the beauty of R is that there are tons of researchers who are actively developing software that you can use to do your work in R. Here is an example of how we install packages:
 
 ```{r}
 install.packages('tidyverse')
@@ -61,7 +61,7 @@ In order to analyze you data in R, you need to be able to load your data into R,
 data = read_tsv("PCa_expression_data.tsv")
 ```
 
-This file is subset of the data from a manuscript on biorxiv (https://www.biorxiv.org/content/10.1101/604058v1.full). Today, we will look at normalized expression values of genes from a diagnostic panel that is currently used to determine Prostate cancer (PCa) prognosis in men with low or favorable intermediate risk disease. Some data exists that suggests the tests may provide inconsistent risk estimates in the presence of multifocal disease. But the data you will look at will be used to explore if the expression values for genes are different in African American men compared to European American men. Caution needs to be excercised in clinical decision making, and the risk scores determined from these tests need to be re-evaluated if there are statistically significant differences between the expression based on ancestry.
+This file is subset of the data from a manuscript on biorxiv (https://www.biorxiv.org/content/10.1101/604058v1.full). Today, we will look at normalized expression values of genes from a diagnostic panel that is currently used to determine Prostate cancer (PCa) prognosis in men with low or favorable intermediate risk disease. Some data suggests the tests may provide inconsistent risk estimates in the presence of multifocal disease. But the data you will look at will be used to explore if the expression values for genes are different in African American men compared to European American men. Caution needs to be excercised in clinical decision making, and the risk scores determined from these tests need to be re-evaluated if there are statistically significant differences between the expression based on ancestry.
 
 `read_tsv` reads in the values from the file into what is called a `tibble`.
 
@@ -480,6 +480,9 @@ I hope this tutorial was a helpful introduction to RStudio, dplyr, and ggplots. 
 ### R Studio Online Learning
 https://www.rstudio.com/online-learning/
 
+### R Programming
+Efficient R programming (https://csgillespie.github.io/efficientR/index.html)
+
 ### Tidyverse 
 https://r4ds.had.co.nz/
 
@@ -494,4 +497,4 @@ https://www-bcf.usc.edu/~gareth/ISL/ISLR%20First%20Printing.pdf
 ## CONTACT INFO
 
 Dr. Aakrosh Ratan
-ar7jq at virginia dot edu
+ratan at virginia dot edu

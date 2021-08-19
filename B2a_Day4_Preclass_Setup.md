@@ -1,7 +1,7 @@
 ---
-DATE: 09/03/2020
-VERSION: 4.0.2
-PKGNAME: R-4.0.2.pkg
+DATE: 08/25/2021
+VERSION: 4.1.1
+PKGNAME: R-4.1.1.pkg
 ---
 
 # BIMS 6000 Core Course -- %DATE% - Afternoon Activity
@@ -78,5 +78,11 @@ and then enter that line (command+enter for mac, or ctrl+enter for PC). Your con
   i. Please also have all files on the "UVA Collab" site downloaded and on your computer's desktop at the start of the session.
 
   j. In RStudio, click on "File" and then "Open File..." and open the `B2a_Day4_R_Tutorial.Rmd` file in RStudio. We'll be working through this document for the tutorial.
+  
+  k. We'll also need to install some R packages which provide capabilities we will use to analyze data. Specifically, we will be using the package "tidyverse" for analyses. You can install tidyverse by using the following command in the console 
 
-  k. If you have any problems, help with the installation will be available at the lunch hour on the date the activity is scheduled. The best way to approach having any problem with bioinformatics is to find someone else running the same operating system as you, who has successfully completed the download. They will be well equipped to help you, especially if you are using PC.
+```{r}
+install.packages('tidyverse')
+```
+
+  k. If you have any problems, help with the installations will be available at the lunch hour on the date the activity is scheduled. The best way to approach having any problem with bioinformatics is to find someone else running the same operating system as you, who has successfully completed the download. They will be well equipped to help you, especially if you are using PC.
