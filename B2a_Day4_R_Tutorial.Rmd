@@ -54,6 +54,8 @@ sessionInfo()
 ```
 So now we have everything set up, let's pull in the most important piece of the puzzle, your data. 
 
+Note: You can also associate RStudio projects with R working directories to simplify project management. You can read more about it here: https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects
+
 ## 2. Objects, aka your data
 In order to analyze you data in R, you need to be able to load your data into R, and you need to know how to refer to it. So, let's read in some and give it a name. In this example, suppose you are in your working directory and it contains a tab-delimited file named `PCa_expression_data.tsv`, the following code would read that in:
 
@@ -61,7 +63,7 @@ In order to analyze you data in R, you need to be able to load your data into R,
 data = read_tsv("PCa_expression_data.tsv")
 ```
 
-This file is subset of the data from a manuscript on biorxiv (https://www.biorxiv.org/content/10.1101/604058v1.full). Today, we will look at normalized expression values of genes from a diagnostic panel that is currently used to determine Prostate cancer (PCa) prognosis in men with low or favorable intermediate risk disease. Some data suggests the tests may provide inconsistent risk estimates in the presence of multifocal disease. But the data you will look at will be used to explore if the expression values for genes are different in African American men compared to European American men. Caution needs to be excercised in clinical decision making, and the risk scores determined from these tests need to be re-evaluated if there are statistically significant differences between the expression based on ancestry.
+This file is subset of the data from a manuscript on bioRxiv (https://www.biorxiv.org/content/10.1101/604058v1.full). Today, we will look at normalized expression values of genes from a diagnostic panel that is currently used to determine Prostate cancer (PCa) prognosis in men with low or favorable intermediate risk disease. Some data suggests the tests may provide inconsistent risk estimates in the presence of multifocal disease. But the data you will look at will be used to explore if the expression values for genes are different in African American men compared to European American men. Caution needs to be exercised in clinical decision making, and the risk scores determined from these tests need to be re-evaluated if there are statistically significant differences between the expression based on ancestry.
 
 `read_tsv` reads in the values from the file into what is called a `tibble`.
 
@@ -479,6 +481,7 @@ I hope this tutorial was a helpful introduction to RStudio, dplyr, and ggplots. 
 
 ### R Studio Online Learning
 https://www.rstudio.com/online-learning/
+https://support.rstudio.com/hc/en-us/sections/200107586-Using-the-RStudio-IDE
 
 ### R Programming
 Efficient R programming (https://csgillespie.github.io/efficientR/index.html)

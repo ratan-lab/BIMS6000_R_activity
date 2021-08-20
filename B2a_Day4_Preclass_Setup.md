@@ -12,6 +12,13 @@ The purpose of this activity is to introduce you to data analysis and plotting i
 
 ## Please do the following prior to the class on %DATE% :
 
+1) Download and install R
+2) Download and install RStudio
+3) Open 2a_Day4_R_Tutorial.Rmd in RStudio 
+4) Install 'tidyverse' package.
+
+Below are the detailed instructions for the above steps.
+
 ### 1. Download and install R
   a. Downloads for both Macs and PCs can be found at <https://cran.rstudio.com/>.
   
@@ -68,7 +75,7 @@ The purpose of this activity is to introduce you to data analysis and plotting i
 print("Hello World!")
 ```
 
-and then enter that line (command+enter for mac, or ctrl+enter for PC). Your console should echo the statement back to you like this
+  and then enter that line (command+enter for mac, or ctrl+enter for PC). Your console should echo the statement back to you like this
 
 ```{r}
 >print("Hello World!")
@@ -85,4 +92,4 @@ and then enter that line (command+enter for mac, or ctrl+enter for PC). Your con
 install.packages('tidyverse')
 ```
 
-  k. If you have any problems, help with the installations will be available at the lunch hour on the date the activity is scheduled. The best way to approach having any problem with bioinformatics is to find someone else running the same operating system as you, who has successfully completed the download. They will be well equipped to help you, especially if you are using PC.
+  l. If you have any problems, help with the installations will be available at the lunch hour on the date the activity is scheduled. The best way to approach having any problem with bioinformatics is to find someone else running the same operating system as you, who has successfully completed the download. They will be well equipped to help you, especially if you are using PC.
