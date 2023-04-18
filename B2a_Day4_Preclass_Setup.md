@@ -2,6 +2,7 @@
 DATE: 08/25/2021
 VERSION: 4.1.1
 PKGNAME: R-4.1.1.pkg
+FILENAME: B2a_Day3_R_Tutorial.Rmd
 ---
 
 # BIMS 6000 Core Course -- %DATE% - Afternoon Activity
@@ -14,7 +15,7 @@ The purpose of this activity is to introduce you to data analysis and plotting i
 
 1) Download and install R
 2) Download and install RStudio
-3) Open 2a_Day4_R_Tutorial.Rmd in RStudio 
+3) Open %FILENAME% in RStudio 
 4) Install 'tidyverse' package.
 
 Below are the detailed instructions for the above steps.
@@ -84,7 +85,7 @@ print("Hello World!")
 
   i. Please also have all files on the "UVA Collab" site downloaded and on your computer's desktop at the start of the session.
 
-  j. In RStudio, click on "File" and then "Open File..." and open the `B2a_Day4_R_Tutorial.Rmd` file in RStudio. We'll be working through this document for the tutorial.
+  j. In RStudio, click on "File" and then "Open File..." and open the %FILENAME% file in RStudio. We'll be working through this document for the tutorial.
   
   k. We'll also need to install some R packages which provide capabilities we will use to analyze data. Specifically, we will be using the package "tidyverse" for analyses. You can install tidyverse by using the following command in the console 
 
